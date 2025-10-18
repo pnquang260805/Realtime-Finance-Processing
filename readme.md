@@ -1,0 +1,2 @@
+## Kiến trúc
+![Kiến trúc](images/Realtime.jpg)
