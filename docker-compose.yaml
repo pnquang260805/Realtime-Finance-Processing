@@ -1,1 +1,201 @@
 # kafka, flink, nifi, druid
+services:
+  kafka:
+    image: apache/kafka:4.0.1
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      - KAFKA_NODE_ID=1
+      - KAFKA_PROCESS_ROLES=broker,controller
+      - KAFKA_LISTENERS=PLAINTEXT://:9092,CONTROLLER://:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      # <node.id>@<host>:<controller_port> -> thành viên với node.id trên <host>:<controller_port> tham gia vote
+      # nếu chạy nhiều node KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka1:9093,2@kafka2:9093,3@kafka3:9093
+      # Mọi node đóng vai trò controller đều phải có KAFKA_CONTROLLER_QUORUM_VOTERS
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+    networks:
+      - project_net
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop:4.2.0
+    container_name: kafdrop
+    ports:
+      - "9000:9000"
+    environment:
+      - KAFKA_BROKERCONNECT=kafka:9092
+      # - JVM_OPTS="-Xms32M -Xmx64M"
+    networks:
+      - project_net
+  
+  jobmanager:
+    build: 
+      context: .
+      dockerfile: ./dockerfiles/flink.dockerfile
+    container_name: jobmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+    networks:
+      - project_net
+    ports:
+      - "8081:8081"
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 1gb
+    command: jobmanager
+
+  taskmanager:
+    build: 
+      context: .
+      dockerfile: ./dockerfiles/flink.dockerfile
+    container_name: taskmanager
+    depends_on:
+      - jobmanager
+    command: taskmanager
+    environment:
+      - |
+        FLINK_PROPERTIES=
+        jobmanager.rpc.address: jobmanager
+    networks:
+      - project_net
+    deploy:
+      resources:
+        limits:
+          cpus: 1
+          memory: 1gb
+
+  # Druid cluster
+
+  # Database for Druid
+  postgres:
+    container_name: postgres
+    image: postgres:16.10-alpine3.22
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./docker-data/metadata_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=FoolishPassword
+      - POSTGRES_USER=druid
+      - POSTGRES_DB=druid
+    networks:
+      - project_net
+
+  # Zookeeper for Druid
+  zookeeper:
+    container_name: zookeeper
+    image: zookeeper:3.9.4
+    ports:
+      - "2181:2181"
+    environment:
+      - ZOO_MY_ID=1
+    networks:
+      - project_net
+
+  # Coordinator for Druid
+  coordinator:
+    image: apache/druid:34.0.0-rc2
+    container_name: coordinator
+    volumes:
+      - ./docker-data/druid_shared:/opt/shared
+      - ./docker-data/coordinator_var:/opt/druid/var
+    depends_on:
+      - zookeeper
+      - postgres
+    ports:
+      - "8091:8081"
+    command:
+      - coordinator
+    env_file:
+      - environment
+    networks:
+      - project_net
+  # Broker for Druid
+  broker:
+    image: apache/druid:34.0.0-rc2
+    container_name: broker
+    volumes:
+      - ./docker-data/broker_var:/opt/druid/var
+    depends_on:
+      - zookeeper
+      - postgres
+      - coordinator
+    ports:
+      - "8092:8082"
+    command:
+      - broker
+    env_file:
+      - environment
+    networks:
+      - project_net
+
+  # Historical for Druid
+  historical:
+    image: apache/druid:34.0.0-rc2
+    container_name: historical
+    volumes:
+      - ./docker-data/druid_shared:/opt/shared
+      - ./docker-data/historical_var:/opt/druid/var
+    depends_on: 
+      - zookeeper
+      - postgres
+      - coordinator
+    ports:
+      - "8093:8083"
+    command:
+      - historical
+    env_file:
+      - environment
+    networks:
+      - project_net
+
+  # MiddleManager for Druid
+  middlemanager:
+    image: apache/druid:34.0.0-rc2
+    container_name: middlemanager
+    volumes:
+      - ./docker-data/druid_shared:/opt/shared
+      - ./docker-data/middle_var:/opt/druid/var
+    depends_on: 
+      - zookeeper
+      - postgres
+      - coordinator
+    ports:
+      - "8094:8091"
+      - "9100-9105:8100-8105"
+    command:
+      - middleManager
+    env_file:
+      - environment
+    networks:
+      - project_net
+
+  # Router for Druid
+  router:
+    image: apache/druid:34.0.0-rc2
+    container_name: router
+    volumes:
+      - ./docker-data/router_var:/opt/druid/var
+    depends_on:
+      - zookeeper
+      - postgres
+      - coordinator
+    ports:
+      - "8888:8888"
+    command:
+      - router
+    env_file:
+      - environment
+    networks:
+      - project_net
+
+networks:
+  project_net:
+    driver: bridge
