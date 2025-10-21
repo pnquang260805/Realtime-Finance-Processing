@@ -1,4 +1,5 @@
 python-dotenv
 requests
 websocket-client
-apache-flink=2.1.0
+apache-flink==2.1.0
+confluent-kafka
