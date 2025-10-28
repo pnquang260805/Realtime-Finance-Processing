@@ -5,6 +5,7 @@ services:
     container_name: kafka
     ports:
       - "29092:29092"
+      - "9092:9092"
       - "9093:9093"
     environment:
       - KAFKA_NODE_ID=1
@@ -27,23 +28,23 @@ services:
       /opt/kafka/bin/kafka-topics.sh --create --if-not-exists --topic raw-trade-topic --bootstrap-server kafka:29092 ;
       /opt/kafka/bin/kafka-topics.sh --create --if-not-exists --topic processed-trade-topic --bootstrap-server kafka:29092 ;
     networks:
-      - project-net
+      - project_net
   kafdrop:
     image: obsidiandynamics/kafdrop:4.2.0
     container_name: kafdrop
     ports:
       - "9000:9000"
     environment:
-      - KAFKA_BROKERCONNECT=kafka:9092
+      - KAFKA_BROKERCONNECT=kafka:29092
       # - JVM_OPTS="-Xms32M -Xmx64M"
     networks:
       - project_net
 
   jobmanager:
+    container_name: jobmanager
     build:
       context: .
       dockerfile: ./dockerfiles/flink.dockerfile
-    container_name: jobmanager
     environment:
       - |
         FLINK_PROPERTIES=
@@ -64,10 +65,10 @@ services:
       - ./:/opt/flink/jobs
 
   taskmanager:
+    container_name: taskmanager
     build:
       context: .
       dockerfile: ./dockerfiles/flink.dockerfile
-    container_name: taskmanager
     depends_on:
       - jobmanager
     command: taskmanager

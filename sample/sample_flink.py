@@ -4,8 +4,8 @@ from pyflink.common.serialization import SimpleStringSchema
 from pyflink.common.watermark_strategy import WatermarkStrategy
 from pyflink.common import Configuration
 
-flink_kafka_connector_path = "file:///opt/flink/jobs/jars/flink-sql-connector-kafka-4.0.1-2.0.jar"
-kafka_clients_path = "file:///opt/flink/jobs/jars/kafka-clients-4.1.0.jar"
+flink_kafka_connector_path = "file:///opt/flink/usrlib/flink-sql-connector-kafka-4.0.1-2.0.jar"
+kafka_clients_path = "file:///opt/flink/usrlib/kafka-clients-4.1.0.jar"
 
 config = Configuration()
 config.set_string("python.execution-mode", "process")
@@ -87,4 +87,6 @@ extracted_table_query = f"""
 """
 transformed_data = t_env.sql_query(
     extracted_table_query)  # Cái này trả về 1 TableResult
+# Xử lý tiếp
+# x = t_env.create_temporary_table("name", transformed_data)
 transformed_data.execute_insert(kafka_dest_name).wait()
