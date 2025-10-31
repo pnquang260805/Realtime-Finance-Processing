@@ -14,12 +14,12 @@ red = redis.Redis(
 )
 
 
-@app.post("/")
+@app.post("/q")
 def set_key(key: str, value: str):
     red.set(key, value)
 
 
-@app.get("/")
+@app.get("/q")
 def get_key(key: str):
     val = red.get(key)
     if val is not None:
