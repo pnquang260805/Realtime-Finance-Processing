@@ -2,4 +2,3 @@
 /docker-data
 .env
 **/.vscode
-main.py
