@@ -1,9 +1,14 @@
 import os
 import sys
 
+from pyflink.table.udf import udf
+from pyflink.table import DataTypes
 
 from services.transform_finnhub import FinnhubTransform
 from services.validate_and_deduplicate import Validate, Deduplication
+from user_defined_functions.symbol_price_udf import SymbolPriceUdf
+from user_defined_functions.symbol_volume import SymbolVolume
+
 if __name__ == "__main__":
     broker = "kafka:29092"
     jars_base = "/opt/flink/usrlib"
@@ -17,9 +22,11 @@ if __name__ == "__main__":
 
     transformer = FinnhubTransform(jars_path, broker)
     t_env = transformer.t_env
+    t_env.create_temporary_function("push_symbol_price", udf(SymbolPriceUdf(), result_type=DataTypes.STRING()))
+    t_env.create_temporary_function("push_symbol_volume", udf(SymbolVolume(), result_type=DataTypes.INT()))
     flattened_table = transformer.transform(
             input_topic, output_topic,
-            src_table_name=src_table, 
+            src_table_name=src_table,
             out_table_name=flatten_table
         )
     t_env.create_temporary_view("flattened_data", flattened_table)
@@ -56,9 +63,9 @@ if __name__ == "__main__":
 
     output_query = f"""
         SELECT 
-            symbol,
+            push_symbol_price(CAST(symbol AS STRING), price),
             price,
-            volume,
+            push_symbol_volume(CAST(symbol AS STRING),volume),
             high,
             low,
             previous_close,

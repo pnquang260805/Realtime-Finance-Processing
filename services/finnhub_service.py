@@ -1,5 +1,6 @@
 import json
 import websocket
+import requests
 
 from typing import List
 
@@ -18,6 +19,7 @@ class FinnhubService:
             data = json.loads(message)
             if data["type"] == "ping":
                 return
+            print(data)
             serialized = json.dumps(data)
             self.kafka_service.send_message(
                 serialized, self.kafka_output_topic)
