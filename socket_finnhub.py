@@ -8,7 +8,7 @@ load_dotenv()
 FINNHUB_KEY = os.getenv("FINHUB_TOKEN")
 print(FINNHUB_KEY)
 
-symbols = ["APPL", "META", "AMZN"]
+symbols = ["AAPL", "META", "AMZN"]
 
 kafka_service = KafkaService()
 kafka_service.init_producer("localhost:9092")
