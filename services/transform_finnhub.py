@@ -8,6 +8,7 @@ from pyflink.table.types import FloatType
 
 from services.flink_service import FlinkService
 from utils.redis_lookup import RedisLookup
+from schema.kafka_schema import KafkaSchema
 
 
 @udf(result_type=FloatType())
@@ -22,43 +23,13 @@ class FinnhubTransform(FlinkService):
     def __post_init__(self):
         super().__post_init__()
         self.lookup = RedisLookup()
-
-    def __kafka_source_schema(self) -> Schema:
-        return (Schema.new_builder()
-                .column("data", DataTypes.ARRAY(DataTypes.ROW([
-                    DataTypes.FIELD(
-                        "p", DataTypes.FLOAT()),
-                    DataTypes.FIELD(
-                        "s", DataTypes.STRING()),
-                    DataTypes.FIELD(
-                        "t", DataTypes.FLOAT()),
-                    DataTypes.FIELD(
-                        "v", DataTypes.FLOAT()),
-                ])))
-                .column("type", DataTypes.STRING())
-                .build())
-
-    def __output_table_schema(self) -> Schema:
-        return (
-            Schema.new_builder()
-            .column("symbol", DataTypes.STRING())
-            .column("price", DataTypes.FLOAT())
-            .column("volume", DataTypes.FLOAT())
-            .column("high", DataTypes.FLOAT())
-            .column("low", DataTypes.FLOAT())
-            .column("previous_close", DataTypes.FLOAT())
-            .column("price_change", DataTypes.FLOAT())
-            .column("change_percentage", DataTypes.FLOAT())
-            .column("trade_type", DataTypes.STRING())
-            .column("ts", DataTypes.FLOAT())
-            .build()
-        )
+        self.kafka_schema = KafkaSchema()
 
     def __register_kafka_tables(self, input_topic: str, output_topic: str, source_table_name="src_temp", output_table_name="out_temp") -> None:
         self.t_env.create_temporary_table(source_table_name,
                                           TableDescriptor.for_connector(
                                               connector="kafka")
-                                          .schema(self.__kafka_source_schema())
+                                          .schema(self.kafka_schema.kafka_source_schema())
                                           .option("topic", input_topic)
                                           .option('properties.bootstrap.servers', self.kafka_broker)
                                           .option('properties.group.id', 'transaction_group')
@@ -73,7 +44,7 @@ class FinnhubTransform(FlinkService):
         self.t_env.create_temporary_table(
             output_table_name,
             TableDescriptor.for_connector("kafka")
-            .schema(self.__output_table_schema())
+            .schema(self.kafka_schema.output_table_schema())
             .option("topic", output_topic)
             .option('properties.bootstrap.servers', self.kafka_broker)
             .format(FormatDescriptor.for_format('json')
