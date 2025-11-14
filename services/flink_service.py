@@ -2,12 +2,8 @@ from dataclasses import dataclass
 
 from typing import List
 
-from pyflink.table import EnvironmentSettings, TableEnvironment, TableDescriptor, Schema, DataTypes, FormatDescriptor
-from pyflink.datastream.connectors.kafka import KafkaSource, KafkaSink, KafkaOffsetsInitializer, KafkaRecordSerializationSchema
-from pyflink.common.serialization import SimpleStringSchema
-from pyflink.common.watermark_strategy import WatermarkStrategy
+from pyflink.table import EnvironmentSettings, TableEnvironment
 from pyflink.common import Configuration
-from pyflink.table import expressions as exprs
 
 
 @dataclass
