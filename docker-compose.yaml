@@ -234,31 +234,6 @@ services:
     networks:
       - project_net
 
-  node_exporter:
-    image: prom/node-exporter:v1.10.2
-    container_name: node_exporter
-    command:
-      - '--path.rootfs=/host'
-    pid: host
-    volumes:
-      - '/:/host:ro'
-    networks:
-      - project_net
-
-  prometheus:
-    image: prom/prometheus:v3.7.3
-    container_name: prometheus
-    ports:
-      - "9090:9090"
-    volumes:
-      # Take up prometheus config file
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./docker-data/prometheus:/prometheus
-    command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-    networks:
-      - project_net
-
   grafana:
     image: grafana/grafana:12.3.0-19020365962
     container_name: grafana
@@ -271,13 +246,15 @@ services:
     environment:
       - GF_INSTALL_PLUGINS=grafadruid-druid-datasource
 
-  pushgateway:
-    image: prom/pushgateway:v1.11.2
-    container_name: pushgateway
+  cronjob:
+    container_name: cronjob
+    build:
+      context: ./daily_call_data
+      dockerfile: Dockerfile
     networks:
       - project_net
-    ports:
-      - "9091:9091"
+    depends_on:
+      - redis-api
 
 networks:
   project_net:

@@ -5,7 +5,7 @@ from services.finnhub_service import FinnhubService
 from services.kafka_service import KafkaService
 load_dotenv()
 
-FINNHUB_KEY = os.getenv("FINHUB_TOKEN")
+FINNHUB_KEY = os.getenv("FINNHUB_TOKEN")
 print(FINNHUB_KEY)
 
 symbols = ["AAPL", "META", "AMZN"]

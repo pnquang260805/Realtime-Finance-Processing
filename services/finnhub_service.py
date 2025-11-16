@@ -18,9 +18,9 @@ class FinnhubService:
     def __on_message(self, ws, message):
         try:
             data = json.loads(message)
+            print(data)
             if data["type"] == "ping":
                 return
-            print(data)
 
             now = datetime.now()
             redis_api_host = "localhost"
@@ -59,5 +59,6 @@ class FinnhubService:
         socket = f"wss://ws.finnhub.io?token={self.token}"
         ws = websocket.WebSocketApp(
             socket, on_close=self.__on_close, on_error=self.__on_error, on_message=self.__on_message)
+        print("Connecting")
         ws.on_open = self.__on_open
         ws.run_forever()

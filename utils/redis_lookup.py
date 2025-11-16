@@ -24,7 +24,7 @@ class RedisLookup:
         if value is not None:
             return value
         else:
-            print("NONE")
+            return "None"
 
     def set_value(self, symbol: str, type: str, value) -> None:
         requests.post(

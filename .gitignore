@@ -5,3 +5,4 @@
 test.*
 *.zip
 /.venv
+/test_cron
