@@ -10,7 +10,7 @@ load_dotenv()
 TOKEN = os.getenv("FINNHUB_TOKEN")
 
 def build_key(symb : str) -> str:
-    today = datetime.now().strftime("%y%m%d")
+    today = datetime.now().strftime("%Y%m%d")
     return f"{today}-{symb}-pc"
 
 def main():
