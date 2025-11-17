@@ -6,7 +6,7 @@ COPY . .
 RUN pip install requests python-dotenv
 # Phải để full path python
 # Mặc định dùng thời gian UTC, không phỉa UTC+7
-RUN echo "20 14  * * /usr/local/bin/python3 /app/main.py >> /app/cron.log 2>&1" > /etc/cron.d/my-cron
+RUN echo "20 14 * * * /usr/local/bin/python3 /app/main.py >> /app/cron.log 2>&1" > /etc/cron.d/my-cron
 RUN echo "" >> /etc/cron.d/my-cron
 RUN chmod 0644 /etc/cron.d/my-cron
 RUN crontab /etc/cron.d/my-cron
