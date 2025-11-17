@@ -5,7 +5,6 @@ parallelism.default: 1
 taskmanager.numberOfTaskSlots: 4
 metrics.reporters: prom
 jobmanager.rpc.address: jobmanager
-metrics.reporter.prom.host: 0.0.0.0
-metrics.reporter.prom.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
+metrics.reporter.prom.factory.class: org.apache.flink.metrics.prometheus.PrometheusReporterFactory
 jobmanager.memory.process.size: 1600m
 query.server.port: 6125

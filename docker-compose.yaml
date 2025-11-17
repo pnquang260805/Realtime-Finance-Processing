@@ -46,6 +46,7 @@ services:
       context: .
       dockerfile: ./dockerfiles/flink.dockerfile
     environment:
+    # Thêm vào trong này thay vì file flink-conf
       - |
         FLINK_PROPERTIES=
         jobmanager.rpc.address: jobmanager
@@ -66,6 +67,7 @@ services:
     command: jobmanager
     volumes:
       - ./:/opt/flink/jobs
+      - ./flink-conf.yaml:/opt/flink/config/flink-conf.yaml
 
   taskmanager:
     container_name: taskmanager
@@ -91,6 +93,22 @@ services:
         limits:
           cpus: 1
           memory: 1gb
+    volumes:
+      - ./flink-conf.yaml:/opt/flink/config/flink-conf.yaml
+
+  prometheus:
+    image: prom/prometheus:v3.7.3
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      # Take up prometheus config file
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - ./docker-data/prometheus:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yaml'
+    networks:
+      - project_net
 
   # Druid cluster
 
