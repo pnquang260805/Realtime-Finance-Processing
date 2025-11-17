@@ -1,4 +1,7 @@
 import json
+import random
+import time
+
 from confluent_kafka import Producer
 
 conf = {
@@ -8,15 +11,16 @@ conf = {
 
 producer = Producer(conf)
 
-data = {
+def msg():
+    return {
     "data": [
         {
             "c": [
                 "1",
                 "8"
             ],
-            "p": 559.32,
-            # "s": "AAPL",
+            "p": random.random() * 100,
+            "s": "AAPL",
             "t": 1761230062740,
             "v": 100
         },
@@ -25,8 +29,8 @@ data = {
                 "1",
                 "8"
             ],
-            "p": 559.32,
-            # "s": "AAPL",
+            "p": random.random() * 100,
+            "s": "AAPL",
             "t": 1761230062740,
             "v": 100
         }
@@ -34,7 +38,6 @@ data = {
     "type": "trade"
 }
 
-serialized = json.dumps(data)
 topic = "raw-trade-topic"
 
 
@@ -49,8 +52,14 @@ def delivery_report(err, msg):
 print("📤 Sending message ...")
 
 try:
-    producer.produce(topic, value=serialized, callback=delivery_report)
-    producer.flush()
-    print("✅ Sent successfully.")
+    n = random.randint(1, 1000)
+    print(n)
+    for i in range(n):
+        data = msg()
+        serialized = json.dumps(data)
+        producer.produce(topic, value=serialized, callback=delivery_report)
+        producer.flush()
+        print(f"✅ Sent successfully. {i+1}")
+        time.sleep(2)
 except Exception as e:
     print(f"⚠️ Failed to send message: {e}")
