@@ -11,7 +11,7 @@ from user_defined_functions.symbol_volume import SymbolVolume
 if __name__ == "__main__":
     broker = "kafka:29092"
     jars_base = "/opt/flink/usrlib"
-    jars_name = ["flink-sql-connector-kafka-3.4.0-1.20", "kafka-clients-4.1.0", "flink-metrics-prometheus-1.20.2"]
+    jars_name = ["flink-sql-connector-kafka-4.0.1-2.0", "kafka-clients-4.1.0", "flink-metrics-prometheus-2.0.0"]
     jars_path = [os.path.join(jars_base, f"{jar}.jar") for jar in jars_name]
 
     input_topic = "raw-trade-topic"

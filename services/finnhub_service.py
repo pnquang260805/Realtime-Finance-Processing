@@ -1,6 +1,7 @@
 import json
 import websocket
 import requests
+import uuid
 
 from datetime import datetime
 from typing import List
@@ -39,6 +40,7 @@ class FinnhubService:
             if low_in_db.status_code == 400 or float(low_in_db.json().get("value")) > current_price:
                 requests.post(f"http://{redis_api_host}:{redis_api_port}/q?key={low_key}&value={current_price}")
 
+            data["id"] = str(uuid.uuid4())
             serialized = json.dumps(data)
             self.kafka_service.send_message(
                 serialized, self.kafka_output_topic)

@@ -19,7 +19,7 @@ class KafkaSchema:
     def output_table_schema(self) -> Schema:
         return (
             Schema.new_builder()
-            .column("symbol", DataTypes.STRING())
+            .column("symbol", DataTypes.STRING().not_null())
             .column("price", DataTypes.FLOAT())
             .column("volume", DataTypes.FLOAT())
             .column("high", DataTypes.FLOAT())
@@ -29,5 +29,6 @@ class KafkaSchema:
             .column("change_percentage", DataTypes.FLOAT())
             .column("trade_type", DataTypes.STRING())
             .column("ts", DataTypes.FLOAT())
+            .primary_key("symbol")
             .build()
         )

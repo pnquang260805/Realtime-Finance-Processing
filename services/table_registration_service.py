@@ -20,20 +20,18 @@ class TableRegistrationService(FlinkService):
                                           .option('properties.bootstrap.servers', self.kafka_broker)
                                           .option('properties.group.id', 'transaction_group')
                                           .option('scan.startup.mode', 'latest-offset')
-                                          #   .option('scan.startup.mode', 'earliest-offset')
-                                          .format(FormatDescriptor.for_format('json')  # Gửi string thì flink tự parse
+                                          .format(FormatDescriptor.for_format('json')
                                                   .option('fail-on-missing-field', 'false')
                                                   .option('ignore-parse-errors', 'true')
                                                   .build())
-
                                           .build())
         self.t_env.create_temporary_table(
             output_table_name,
-            TableDescriptor.for_connector("kafka")
+            TableDescriptor.for_connector("upsert-kafka")
             .schema(self.kafka_schema.output_table_schema())
             .option("topic", output_topic)
             .option('properties.bootstrap.servers', self.kafka_broker)
-            .format(FormatDescriptor.for_format('json')
-                    .build())
+            .option("key.format", "json")
+            .option("value.format", "json")
             .build()
         )
