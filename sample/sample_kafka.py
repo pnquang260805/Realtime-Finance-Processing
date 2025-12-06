@@ -1,6 +1,7 @@
 import json
 import random
 import time
+from datetime import datetime
 
 from confluent_kafka import Producer
 
@@ -12,6 +13,7 @@ conf = {
 producer = Producer(conf)
 
 def msg():
+    now = int(datetime.now().timestamp())
     return {
     "data": [
         {
@@ -21,8 +23,8 @@ def msg():
             ],
             "p": random.random() * 100,
             "s": "AAPL",
-            "t": 1761230062740,
-            "v": 100
+            "t": now,
+            "v": random.randint(50, 1000)
         },
         {
             "c": [
@@ -31,8 +33,8 @@ def msg():
             ],
             "p": random.random() * 100,
             "s": "AAPL",
-            "t": 1761230062740,
-            "v": 100
+            "t": now,
+            "v": random.randint(50, 1000)
         }
     ],
     "type": "trade"

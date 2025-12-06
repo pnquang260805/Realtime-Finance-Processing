@@ -6,12 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="1f721e41-b8fb-4c62-9ff8-3b04041586e7" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dockerfiles/flink.dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/dockerfiles/flink.dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_transform.py" beforeDir="false" afterPath="$PROJECT_DIR$/main_transform.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/schema/kafka_schema.py" beforeDir="false" afterPath="$PROJECT_DIR$/schema/kafka_schema.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/finnhub_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/finnhub_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/table_registration_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/table_registration_service.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/services/transform_finnhub.py" beforeDir="false" afterPath="$PROJECT_DIR$/services/transform_finnhub.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/socket_finnhub.py" beforeDir="false" afterPath="$PROJECT_DIR$/socket_finnhub.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
